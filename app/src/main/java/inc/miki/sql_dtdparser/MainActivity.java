@@ -40,60 +40,49 @@ public class MainActivity extends AppCompatActivity {
         String end = "\"]>\"";
 
         String[] separatedCommand = inputText.getText().toString().split("\\(");
-        String tableName = separatedCommand[0];
+            String tableName = separatedCommand[0];
 
 
+            String[] separatedColumns = separatedCommand[1].split(",");
+            String[] columns = new String[separatedColumns.length];
 
 
-        String[] separatedColumns = separatedCommand[1].split(",");
-        String[] columns = new String[separatedColumns.length];
+            for (int i = 0; i < separatedColumns.length; i++) {
+                String[] separatedLine = separatedColumns[i].split(" ");
 
-
-        for (int i = 0; i < separatedColumns.length ; i++) {
-            String[] separatedLine = separatedColumns[i].split(" ");
-
-            if(separatedLine.length >= 3)
-            {
-                if(separatedLine[2].equals("PRIMARY"))
-                {
-                columns[i] = separatedLine[0].replaceAll("\"", "") + id;
-                }
-                else if(separatedLine[2].equals("REFERENCES"))
-                {
-                    columns[i] = separatedLine[0].replaceAll("\"", "") + idref;
+                if (separatedLine.length >= 3) {
+                    if (separatedLine[2].equals("PRIMARY")) {
+                        columns[i] = separatedLine[0].replaceAll("\"", "") + id;
+                    } else if (separatedLine[2].equals("REFERENCES")) {
+                        columns[i] = separatedLine[0].replaceAll("\"", "") + idref;
+                    }
+                } else if (separatedLine.length == 2) {
+                    columns[i] = separatedLine[0].replaceAll("\"", "");
                 }
             }
 
-            else if (separatedLine.length == 2)
-            {
-                columns[i] = separatedLine[0].replaceAll("\"", "");
+            StringBuilder columns1 = new StringBuilder();
+            StringBuilder convertedTextPart2 = new StringBuilder();
+            StringBuilder convertedTextPart3 = new StringBuilder();
+        for (String column : columns) {
+            String s[] = column.split(" ");
+            if (s.length == 1) {
+                columns1.append(s[0]).append(",");
+                convertedTextPart3.append(element).append(column).append(pcData).append(newLine);
+            } else {
+                convertedTextPart2.append(attribute).append(tableName).append(" ").append(column).append(">").append(newLine);
             }
         }
+            columns1 = new StringBuilder(columns1.substring(0, columns1.length() - 1));
 
-        String columns1 = "";
-        String convertedTextPart2 = "";
-        String convertedTextPart3 = "";
-        for (int i = 0; i < columns.length; i++) {
-                String s[] = columns[i].split(" ");
-                if(s.length == 1 )
-                {
-                    columns1 += s[0] + ",";
-                    convertedTextPart3 += element + columns[i] + pcData + newLine;
-                }
-                else
-                {
-                        convertedTextPart2 += attribute + tableName + " "  +  columns[i] + ">" + newLine;
-                }
-        }
-        columns1 = columns1.substring(0,columns1.length() - 1);
-
-        String convertedTextPart1 = xmlSigning + tableName + "[" + newLine +
-                element    + tableName + "(" + columns1 + ") >" + newLine;
+            String convertedTextPart1 = xmlSigning + tableName + "[" + newLine +
+                    element + tableName + "(" + columns1 + ") >" + newLine;
 
 
-      String text = convertedTextPart1 + convertedTextPart2 + convertedTextPart3 + end;
+            String text = convertedTextPart1 + convertedTextPart2 + convertedTextPart3 + end;
 
-        convertedText.setText(text);
+            convertedText.setText(text);
+
         convertButton = findViewById(R.id.a);
         convertButton.setVisibility(View.GONE);
         clearButton = findViewById(R.id.a1);
