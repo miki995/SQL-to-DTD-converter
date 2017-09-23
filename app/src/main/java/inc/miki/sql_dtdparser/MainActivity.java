@@ -1,5 +1,6 @@
 package inc.miki.sql_dtdparser;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -8,17 +9,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-     TextView textView1;
-     TextView textView2;
-     TextView textView3;
-     TextView textView4;
-     TextView textView5;
-     TextView textView6;
-     TextView textView7;
-    TextView textView8;
-    TextView textParsedd;
-    Button parseButton;
-    Button clearButton;
+     TextView inputText;
+     TextView convertedText;
+     Button convertButton;
+     Button clearButton;
 
 
     @Override
@@ -26,83 +20,104 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView1 = findViewById(R.id.textView1);
-        textView2 = findViewById(R.id.textView2);
-        textView3 = findViewById(R.id.textView3);
-        textView4 = findViewById(R.id.textView4);
-        textView5 = findViewById(R.id.textView5);
-        textView6 = findViewById(R.id.textView6);
-        textView7 = findViewById(R.id.textView7);
-        textView8 = findViewById(R.id.textView8);
-        textParsedd= findViewById(R.id.textParsed);
-
-         clearButton = findViewById(R.id.a1);
+        inputText = findViewById(R.id.inputText);
+        convertedText = findViewById(R.id.convertedText);
+        clearButton = findViewById(R.id.a1);
         clearButton.setVisibility(View.GONE);
+
         initializeData();
+
     }
 
     public void convertData(View view) {
-        String a1 = textView1.getText().toString();
-        String a2 = textView2.getText().toString();
-        String a3 = textView3.getText().toString();
-        String a4 = textView4.getText().toString();
-        String a5 = textView5.getText().toString();
-        String a6 = textView6.getText().toString();
-        String a7 = textView7.getText().toString();
-
-        String tableName = a1.substring(12,20);
-        String id = a2.substring(1,3);
-        String sgroup = a3.substring(1,7);
-        String neptun = a4.substring(1,9);
-        String name = a5.substring(1,5);
-        String email = a6.substring(1,6);
-        String program = a7.substring(1,8);
         String pcData = " (#PCDATA)>";
-        String xmlSigning = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        String xmlSigning = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + "<!DOCTYPE ";
         String element = "<!ELEMENT ";
         String attribute = "<!ATTLIST ";
         String newLine = "\n";
+        String id = " ID #REQUIRED";
+        String idref = " IDREF #REQUIRED";
+        String end = "\"]>\"";
 
-        String convertedText = xmlSigning + newLine
-                + "<!DOCTYPE " + tableName  +  "[" + newLine
-                + element   + tableName  +  "(" + neptun + "?, " + name + "+, " + email + "?, " + program + "+) >"  + newLine
-                + attribute + tableName  + " " +  id + " ID #REQUIRED >" + newLine
-                + attribute + tableName  +  " " + sgroup +  " IDREF #REQUIRED >" + newLine
-                + element   + neptun     +  pcData + newLine
-                + element   + name       +  pcData + newLine
-                + element   + email      +  pcData + newLine
-                + element   + program    +  pcData + newLine
-                + "]>";
+        String[] separatedCommand = inputText.getText().toString().split("\\(");
+        String tableName = separatedCommand[0];
 
 
 
-        textParsedd.setText(convertedText);
 
-        parseButton = findViewById(R.id.a);
-        parseButton.setVisibility(View.GONE);
+        String[] separatedColumns = separatedCommand[1].split(",");
+        String[] columns = new String[separatedColumns.length];
+
+
+        for (int i = 0; i < separatedColumns.length ; i++) {
+            String[] separatedLine = separatedColumns[i].split(" ");
+
+            if(separatedLine.length >= 3)
+            {
+                if(separatedLine[2].equals("PRIMARY"))
+                {
+                columns[i] = separatedLine[0].replaceAll("\"", "") + id;
+                }
+                else if(separatedLine[2].equals("REFERENCES"))
+                {
+                    columns[i] = separatedLine[0].replaceAll("\"", "") + idref;
+                }
+            }
+
+            else if (separatedLine.length == 2)
+            {
+                columns[i] = separatedLine[0].replaceAll("\"", "");
+            }
+        }
+
+        String columns1 = "";
+        String convertedTextPart2 = "";
+        String convertedTextPart3 = "";
+        for (int i = 0; i < columns.length; i++) {
+                String s[] = columns[i].split(" ");
+                if(s.length == 1 )
+                {
+                    columns1 += s[0] + ",";
+                    convertedTextPart3 += element + columns[i] + pcData + newLine;
+                }
+                else
+                {
+                        convertedTextPart2 += attribute + tableName + " "  +  columns[i] + ">" + newLine;
+                }
+        }
+        columns1 = columns1.substring(0,columns1.length() - 1);
+
+        String convertedTextPart1 = xmlSigning + tableName + "[" + newLine +
+                element    + tableName + "(" + columns1 + ") >" + newLine;
+
+
+      String text = convertedTextPart1 + convertedTextPart2 + convertedTextPart3 + end;
+
+        convertedText.setText(text);
+        convertButton = findViewById(R.id.a);
+        convertButton.setVisibility(View.GONE);
         clearButton = findViewById(R.id.a1);
         clearButton.setVisibility(View.VISIBLE);
 
     }
+    @SuppressLint("SetTextI18n")
     public void initializeData()
     {
-        textView1.setText("CREATE TABLE Students (");
-        textView2.setText("\"id\" NUMBER(*,0) PRIMARY KEY,");
-        textView3.setText("\"sgroup\" NUMBER(*,0) REFERENCES GROUPS");
-        textView4.setText("\"neptunid\" VARCHAR2(255 BYTE) ,");
-        textView5.setText("\"name\" VARCHAR2(255 BYTE) ,");
-        textView6.setText("\"email\" VARCHAR2(255 BYTE) ,");
-        textView7.setText("\"program\" VARCHAR2(255 BYTE)");
-        textView8.setText(");");
-    }
+        inputText.setText("STUDENTS (\n" +
+                "\"ID\" NUMBER PRIMARY KEY,\n" +
+                "\"SGROUP\" NUMBER REFERENCES GROUPS,\n" +
+                "\"NEPTUNID\" VARCHAR2,\n" +
+                "\"NAME\" VARCHAR2,\n" +
+                "\"EMAIL\" VARCHAR2,\n" +
+                "\"PROGRAM\" VARCHAR2\n");
+     }
 
     public void clearData(View view) {
-        textParsedd.setText("");
-
+        convertedText.setText("");
         clearButton = findViewById(R.id.a1);
         clearButton.setVisibility(View.GONE);
-        parseButton = findViewById(R.id.a);
-        parseButton.setVisibility(View.VISIBLE);
+        convertButton = findViewById(R.id.a);
+        convertButton.setVisibility(View.VISIBLE);
 
     }
 }
