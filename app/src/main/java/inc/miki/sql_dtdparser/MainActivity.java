@@ -49,75 +49,76 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Please enter name for your database!", Toast.LENGTH_SHORT).show();
         } else {
             dataBaseName = databaseText.getText().toString();
-        }
-        if (!inputText.getText().toString().equals("")) {
-            try {
-                String[] sepCommand = inputText.getText().toString().split(";");
 
-                String convertedTextDataBaseName = xmlSigning + dataBaseName + "[" + newLine;
-                StringBuilder finalText = new StringBuilder();
-                finalText.append(convertedTextDataBaseName);
+            if (!inputText.getText().toString().equals("")) {
+                try {
+                    String[] sepCommand = inputText.getText().toString().split(";");
 
-                for (int i = 0; i < sepCommand.length; i++) {
-                    String convertedTextPart1 = "";
-                    String convertedTextPart2 = "";
-                    String convertedTextPart3 = "";
+                    String convertedTextDataBaseName = xmlSigning + dataBaseName + "[" + newLine;
+                    StringBuilder finalText = new StringBuilder();
+                    finalText.append(convertedTextDataBaseName);
 
-                    String[] sepCreate = sepCommand[i].split("\\(");
-                    String[] sep = sepCreate[0].split(" ");
-                    tableName = sep[2];
-                    String[] sepColumns = sepCreate[1].split(",");
-                    String[] columns = new String[sepColumns.length];
+                    for (int i = 0; i < sepCommand.length; i++) {
+                        String convertedTextPart1 = "";
+                        String convertedTextPart2 = "";
+                        String convertedTextPart3 = "";
 
-                    for (int k = 0; k < sepColumns.length; k++) {
-                        String[] sepLine = sepColumns[k].split(" ");
+                        String[] sepCreate = sepCommand[i].split("\\(");
+                        String[] sep = sepCreate[0].split(" ");
+                        tableName = sep[2];
+                        String[] sepColumns = sepCreate[1].split(",");
+                        String[] columns = new String[sepColumns.length];
 
-                        if (sepLine.length >= 3) {
-                            if (sepLine[2].equals("PRIMARY")) {
-                                columns[k] = sepLine[0].replaceAll("\"", "") + id;
-                            } else if (sepLine[2].equals("REFERENCES")) {
-                                columns[k] = sepLine[0].replaceAll("\"", "") + idref;
+                        for (int k = 0; k < sepColumns.length; k++) {
+                            String[] sepLine = sepColumns[k].split(" ");
+
+                            if (sepLine.length >= 3) {
+                                if (sepLine[2].equals("PRIMARY")) {
+                                    columns[k] = sepLine[0].replaceAll("\"", "") + id;
+                                } else if (sepLine[2].equals("REFERENCES")) {
+                                    columns[k] = sepLine[0].replaceAll("\"", "") + idref;
+                                }
+                            } else if (sepLine.length == 2) {
+                                columns[k] = sepLine[0].replaceAll("\"", "");
+                            } else {
+                                columns[k] = "Invalid column!";
                             }
-                        } else if (sepLine.length == 2) {
-                            columns[k] = sepLine[0].replaceAll("\"", "");
-                        } else {
-                            columns[k] = "Invalid column!";
                         }
-                    }
-                    String columns1 = "";
-                    for (int j = 0; j < columns.length; j++) {
-                        String s[] = columns[j].split(" ");
-                        if (s.length == 1) {
-                            columns1 += s[0] + ",";
-                            convertedTextPart2 += newLine + element + columns[j] + pcData;
-                        } else {
-                            convertedTextPart3 += newLine + attribute + tableName + " " + columns[j] + ">";
+                        String columns1 = "";
+                        for (int j = 0; j < columns.length; j++) {
+                            String s[] = columns[j].split(" ");
+                            if (s.length == 1) {
+                                columns1 += s[0] + ",";
+                                convertedTextPart2 += newLine + element + columns[j] + pcData;
+                            } else {
+                                convertedTextPart3 += newLine + attribute + tableName + " " + columns[j] + ">";
+                            }
                         }
+
+                        columns1 = columns1.substring(0, columns1.length() - 1);
+                        convertedTextPart1 = element + tableName + "*" + "(" + columns1 + ") >";
+
+                        finalText.append(newLine)
+                                .append(convertedTextPart1).append(newLine)
+                                .append(convertedTextPart2).append(newLine)
+                                .append(convertedTextPart3).append(newLine).append(newLine).append(newLine);
                     }
 
-                    columns1 = columns1.substring(0, columns1.length() - 1);
-                    convertedTextPart1 = element + tableName + "*" + "(" + columns1 + ") >";
 
-                    finalText.append(newLine)
-                            .append(convertedTextPart1).append(newLine)
-                            .append(convertedTextPart2).append(newLine)
-                            .append(convertedTextPart3).append(newLine).append(newLine).append(newLine);
+                    finalText.append(end);
+                    convertedText.setText(finalText);
+
+                    convertButton = findViewById(R.id.a);
+                    convertButton.setVisibility(View.GONE);
+                    clearButton = findViewById(R.id.a1);
+                    clearButton.setVisibility(View.VISIBLE);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Invalid or misspelled SQL commands", Toast.LENGTH_SHORT).show();
                 }
 
-
-                finalText.append(end);
-                convertedText.setText(finalText);
-
-                convertButton = findViewById(R.id.a);
-                convertButton.setVisibility(View.GONE);
-                clearButton = findViewById(R.id.a1);
-                clearButton.setVisibility(View.VISIBLE);
-            } catch (Exception e) {
-                Toast.makeText(this, "Invalid or misspelled SQL commands", Toast.LENGTH_SHORT).show();
             }
 
         }
-
     }
 
     @SuppressLint("SetTextI18n")
