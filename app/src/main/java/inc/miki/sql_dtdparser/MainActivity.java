@@ -16,6 +16,17 @@ public class MainActivity extends AppCompatActivity {
     Button clearButton;
     TextView databaseText;
 
+    final String pcData = " (#PCDATA)>";
+    final String xmlSigning = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + "<!DOCTYPE ";
+    final String element = "<!ELEMENT ";
+    final String attribute = "<!ATTLIST ";
+    final String newLine = "\n";
+    final String id = " ID #REQUIRED";
+    final String idref = " IDREF #REQUIRED";
+    final String end = "]>";
+    String tableName = "";
+    String dataBaseName = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +44,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void convertData(View view) {
-        String pcData = " (#PCDATA)>";
-        String tableName = "";
-        String xmlSigning = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + "<!DOCTYPE ";
-        String element = "<!ELEMENT ";
-        String attribute = "<!ATTLIST ";
-        String newLine = "\n";
-        String id = " ID #REQUIRED";
-        String idref = " IDREF #REQUIRED";
-        String end = "]>";
 
-
-        String dataBaseName = "";
         if (databaseText.getText().toString().equals("")) {
             Toast.makeText(this, "Please enter name for your database!", Toast.LENGTH_SHORT).show();
         } else {
@@ -58,7 +58,22 @@ public class MainActivity extends AppCompatActivity {
                     StringBuilder finalText = new StringBuilder();
                     finalText.append(convertedTextDataBaseName);
 
-                    for (int i = 0; i < sepCommand.length; i++) {
+                    String tableNames = "";
+                    tableNames += element + dataBaseName + "(";
+                    for (int i = 0; i < sepCommand.length; i++)
+                    {
+                        String[] sepCreate = sepCommand[i].split("\\(");
+                        String[] sep = sepCreate[0].split(" ");
+
+                        tableNames += sep[2] + ",";
+
+                    }
+                    tableNames = tableNames.substring(0,tableNames.length() - 1);
+                    finalText.append(tableNames).append(") >").append(newLine);
+
+
+                    for (int i = 0; i < sepCommand.length; i++)
+                    {
                         String convertedTextPart1 = "";
                         String convertedTextPart2 = "";
                         String convertedTextPart3 = "";
@@ -97,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
 
                         columns1 = columns1.substring(0, columns1.length() - 1);
                         convertedTextPart1 = element + tableName + "*" + "(" + columns1 + ") >";
+
+
+
 
                         finalText.append(newLine)
                                 .append(convertedTextPart1).append(newLine)

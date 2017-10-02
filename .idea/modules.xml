@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/XML-Data-Managment.iml" filepath="$PROJECT_DIR$/XML-Data-Managment.iml" />
+      <module fileurl="file://C:\Users\S\Documents\GitHub\XML-Data-Managment\XML-Data-Managment.iml" filepath="C:\Users\S\Documents\GitHub\XML-Data-Managment\XML-Data-Managment.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
